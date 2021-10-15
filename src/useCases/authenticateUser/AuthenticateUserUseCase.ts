@@ -1,6 +1,8 @@
 import { compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 import { client } from "../../prisma/client"
+import { GenerateRefreshToken } from '../../provider/GenerateRefreshToken';
+import { GenerateTokenProvider } from '../../provider/GenerateTokenProvider';
 
 interface IRequest {
   username: string;
@@ -31,13 +33,19 @@ class AuthenticateUserUseCase {
     }
 
     // Generate user token
+    const generateTokenProvider = new GenerateTokenProvider();
+    const token = await generateTokenProvider.execute(userAleradyExists.id);
 
-    const token = sign({}, process.env.JWT_SECRET_KEY, {
-      subject: userAleradyExists.id,
-      expiresIn: "20s"
+    await client.refreshToken.deleteMany({
+      where: {
+        userId: userAleradyExists.id
+      }
     });
 
-    return { token };
+    const generateRefreshToken = new GenerateRefreshToken();
+    const refreshToken = await generateRefreshToken.execute(userAleradyExists.id);
+
+    return { token, refreshToken };
   }
 }
 
