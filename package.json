@@ -1,7 +1,7 @@
 {
   "name": "prisma-refresh-token",
   "version": "1.0.0",
-  "main": "server.ts",
+  "main": "./src/server.ts",
   "license": "MIT",
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
